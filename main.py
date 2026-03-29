@@ -4,32 +4,37 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, fil
 
 TOKEN = os.environ.get("BOT_TOKEN")
 
+users = {}
+
 menu = [
-    ["⛏ Mine", "🛒 Shop"],
-    ["🏛 Hall", "🏦 Vault"]
+    ["🎮 Iniciar Juego"],
+    ["⛏ Minar Oro", "🛒 Comprar Leprechauns"],
+    ["🍀 Tus Leprechauns", "💰 Depositar"],
+    ["🏦 Retirar", "👥 Referidos"],
+    ["❓ Ayuda"]
 ]
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = ReplyKeyboardMarkup(menu, resize_keyboard=True)
     await update.message.reply_text(
-        "🍀 Dark Leprechaun TON Miner\n\nBienvenido minero!",
+        "🍀 Dark Leprechaun TON Miner\n\nBienvenido!",
         reply_markup=keyboard
     )
 
 async def menu_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.message.from_user.id
     text = update.message.text
 
-    if text == "⛏ Mine":
-        await update.message.reply_text("⛏ Tus Leprechauns están minando oro...")
-        
-    elif text == "🛒 Shop":
-        await update.message.reply_text("🛒 Tienda de Leprechauns (Próximamente)")
-        
-    elif text == "🏛 Hall":
-        await update.message.reply_text("🏛 Tus Leprechauns (Próximamente)")
-        
-    elif text == "🏦 Vault":
-        await update.message.reply_text("🏦 Tu oro guardado (Próximamente)")
+    if text == "🎮 Iniciar Juego":
+        if user_id not in users:
+            users[user_id] = {"gold": 1000}
+            await update.message.reply_text("🍀 Bienvenido!\n\nRecibiste 1000 ORO inicial!")
+        else:
+            await update.message.reply_text("Ya iniciaste el juego!")
+
+    elif text == "⛏ Minar Oro":
+        gold = users.get(user_id, {}).get("gold", 0)
+        await update.message.reply_text(f"⛏ Oro actual: {gold}")
 
 app = ApplicationBuilder().token(TOKEN).build()
 
